@@ -1,0 +1,4 @@
+A simple game built with an Atmel atmega328p, an accelerometer, and a 
+128x64 serial graphic LCD.  
+
+Navigate a ball through a maze using tilt control.
