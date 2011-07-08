@@ -22,7 +22,7 @@
 
 int main() {
     // Set D0, D1 as outputs
-    DDRD = 0x3;
+    DDRD = 0x1;
     PORTD = 0;
 
     uint32_t i;
@@ -30,7 +30,7 @@ int main() {
 		PORTD = 0x1;
         for (i=0; i<50000; ++i) asm volatile ("nop");
 
-		PORTD = 0x2;
+		PORTD = 0x0;
         for (i=0; i<50000; ++i) asm volatile ("nop");
     }
 
