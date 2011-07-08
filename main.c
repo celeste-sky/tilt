@@ -20,18 +20,27 @@
 
 #include <avr/io.h>
 
+#include "usart.h"
+
 int main() {
+    // Change system clock from default 1Mhz to maximum of 8
+    CLKPR = (1<<CLKPCE);  // Unlock clock prescale changes
+    CLKPR = 0; // Div = 1 -> Run at internal osc speed of 8Mhz
+
     // Set D0, D1 as outputs
     DDRD = 0x1;
     PORTD = 0;
 
+    init_usart0(BAUD_9600);
+
     uint32_t i;
     while (1) {
+        usart_write("Hello! ", 7);
 		PORTD = 0x1;
-        for (i=0; i<50000; ++i) asm volatile ("nop");
+        for (i=0; i<400000; ++i) asm volatile ("nop");
 
 		PORTD = 0x0;
-        for (i=0; i<50000; ++i) asm volatile ("nop");
+        for (i=0; i<400000; ++i) asm volatile ("nop");
     }
 
     return 0;
