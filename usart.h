@@ -27,9 +27,14 @@
 #include <avr/io.h>
 
 /* Baud rate generator prescales with 8Mhz system clock.
- * These are approximately equal to the baud periods, but not quite; 
- * They are twiddled for the inaccuracy in the sytem clock */
-#define BAUD_9600 108
+ * These are approximately equal to the baud periods, but not quite,
+ * since the system clock isn't 8Mhz on the button.
+ * All these defs have been seen to work with the FTDI */
+#define BAUD_9600   108
+#define BAUD_19200  54
+#define BAUD_38400  27
+#define BAUD_57600  16
+#define BAUD_115200 8
 
 
 /* Initialize the USART 

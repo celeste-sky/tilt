@@ -27,13 +27,20 @@ int main() {
     CLKPR = (1<<CLKPCE);  // Unlock clock prescale changes
     CLKPR = 0; // Div = 1 -> Run at internal osc speed of 8Mhz
 
-    // Set D0, D1 as outputs
+    // Set D0 as output for blinking
     DDRD = 0x1;
     PORTD = 0;
 
-    init_usart0(BAUD_9600);
-
+    // Delay a bit, to avoid resetting the LCD to b115200
     uint32_t i;
+    for (i=0; i<1000000; ++i) asm volatile ("nop");
+
+    init_usart0(BAUD_115200);
+
+    /* clear screen */
+    usart0_tx('|');
+    usart0_tx('\0');
+
     while (1) {
         usart_write("Hello! ", 7);
 		PORTD = 0x1;
