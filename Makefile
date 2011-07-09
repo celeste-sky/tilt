@@ -37,18 +37,27 @@ SRCS:= main.c \
 # Hex program which is the final output
 OUTPUT:= tilt.hex
 
-# Generate list of objects to compile from list of sources
-OBJS:=$(patsubst %.c,%.o,$(SRCS))
-
-# The name of the elf we will need to link
-ELF:= $(OUTPUT:.hex=.elf)
+# Folder in which to put generated files
+GEN:=gen
 
 # Object compilation rule
-$(OBJS): $$(patsubst %.o,%.c,$$@)
+OBJS:=$(patsubst %.c,$(GEN)/%.o,$(SRCS))
+$(OBJS): $$(patsubst $(GEN)/%.o,%.c,$$@)
+	@if test ! -e $(dir $@); then mkdir -p $(dir $@); fi
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
+# .c dependency generation
+DEPS:=$(patsubst %.c,$(GEN)/%.d,$(SRCS))
+$(DEPS): $$(patsubst $(GEN)/%.d,%.c,$$@)
+	@if test ! -e $(dir $@); then mkdir -p $(dir $@); fi
+	$(CC) $(CFLAGS) $(INCLUDES) -MM -MT $(<:%.c=$(GEN)/%.o) -MF $@ $<
+deps: $(DEPS)
+include $(DEPS)
+
 # Elf compilation rule
+ELF:=$(GEN)/$(OUTPUT:.hex=.elf)
 $(ELF): $(OBJS)
+	@if test ! -e $(dir $@); then mkdir -p $(dir $@); fi
 	$(CC) $(LDFLAGS) -o $@ $^
 
 $(OUTPUT): $(ELF)
@@ -61,11 +70,12 @@ write: $(OUTPUT)
 	sudo avrdude -c $(PROGRAMMER) -p $(AVRDUDE_PART) -U flash:w:$(OUTPUT)
 
 clean:
-	rm -f $(OBJS)
-	rm -f $(OUTPUT) $(ELF)
+	rm -rf $(GEN)
+	rm -f $(OUTPUT)
 
 debugvar:
 	@echo "SRCS: $(SRCS)"
 	@echo "OBJS: $(OBJS)"
+	@echo "DEPS: $(DEPS)"
 	@echo "ELF: $(ELF)"
 
