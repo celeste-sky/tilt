@@ -31,9 +31,10 @@ LDFLAGS:= $(CFLAGS)
 OBJCOPY:=avr-objcopy
 
 # List of sources to compile into hex
-SRCS:= main.c \
-	   usart.c \
-	   lcd.c
+SRCS:= lcd.c \
+       main.c \
+       timer.c \
+	   usart.c
 
 # Hex program which is the final output
 OUTPUT:= tilt.hex

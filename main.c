@@ -19,14 +19,21 @@
  *****************************************************************************/
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
 #include "usart.h"
 #include "lcd.h"
+#include "timer.h"
 
 int main() {
     // Change system clock from default 1Mhz to maximum of 8
     CLKPR = (1<<CLKPCE);  // Unlock clock prescale changes
     CLKPR = 0; // Div = 1 -> Run at internal osc speed of 8Mhz
+
+    sei(); // enable interrupts, for timer.
+
+    // Start system timer
+    init_timer();
 
     // Delay a bit, to avoid resetting the LCD to b115200
     uint32_t i;
@@ -41,8 +48,16 @@ int main() {
     lcd_coord(46, 12);
     usart_write("Hello!", 6);
 
+    DDRD = 0x1; // enable output on D0
+
     uint8_t x = 0;
     while (1) {
+        if (time_ms() & 0x400 ) {
+            PORTD = 0x1;
+        } else {
+            PORTD = 0;
+        }
+
         x++;
         x = x & 0x7f; // = %128
         lcd_circ(x, 32, 4, 1);
