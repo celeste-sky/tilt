@@ -21,15 +21,12 @@
 #include <avr/io.h>
 
 #include "usart.h"
+#include "lcd.h"
 
 int main() {
     // Change system clock from default 1Mhz to maximum of 8
     CLKPR = (1<<CLKPCE);  // Unlock clock prescale changes
     CLKPR = 0; // Div = 1 -> Run at internal osc speed of 8Mhz
-
-    // Set D0 as output for blinking
-    DDRD = 0x1;
-    PORTD = 0;
 
     // Delay a bit, to avoid resetting the LCD to b115200
     uint32_t i;
@@ -37,17 +34,21 @@ int main() {
 
     init_usart0(BAUD_115200);
 
-    /* clear screen */
-    usart0_tx('|');
-    usart0_tx('\0');
+    /* Set up lcd */
+    lcd_clr();
+    lcd_bl_duty(0);
 
+    lcd_coord(46, 12);
+    usart_write("Hello!", 6);
+
+    uint8_t x = 0;
     while (1) {
-        usart_write("Hello! ", 7);
-		PORTD = 0x1;
-        for (i=0; i<400000; ++i) asm volatile ("nop");
+        x++;
+        x = x & 0x7f; // = %128
+        lcd_circ(x, 32, 4, 1);
+        lcd_line(x-4, 28, x-4, 36, 0);
 
-		PORTD = 0x0;
-        for (i=0; i<400000; ++i) asm volatile ("nop");
+        for (i=0; i<25000; ++i) asm volatile ("nop");
     }
 
     return 0;

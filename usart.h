@@ -53,6 +53,6 @@ void usart0_cal(uint8_t baud_prescale);
 
 /* Write the contents of a buffer to the usart.
  * This blocks until the last byte is in the TX buffer */
-void usart_write(uint8_t *buf, uint16_t len);
+void usart_write(char *buf, uint16_t len);
 
 #endif //USART_H_
