@@ -21,9 +21,10 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "usart.h"
+#include "gamestate.h"
 #include "lcd.h"
 #include "timer.h"
+#include "usart.h"
 
 int main() {
     // Change system clock from default 1Mhz to maximum of 8
@@ -36,34 +37,31 @@ int main() {
     init_timer();
 
     // Delay a bit, to avoid resetting the LCD to b115200
-    uint32_t i;
-    for (i=0; i<1000000; ++i) asm volatile ("nop");
+    while (time_ms() < 2000);
 
-    init_usart0(BAUD_115200);
+    init_usart0(BAUD_19200);
 
     /* Set up lcd */
     lcd_clr();
     lcd_bl_duty(0);
 
-    lcd_coord(46, 12);
     usart_write("Hello!", 6);
 
     DDRD = 0x1; // enable output on D0
 
-    uint8_t x = 0;
+    uint32_t last_update = 0;
     while (1) {
+        /* blink! */
         if (time_ms() & 0x400 ) {
             PORTD = 0x1;
         } else {
             PORTD = 0;
         }
 
-        x++;
-        x = x & 0x7f; // = %128
-        lcd_circ(x, 32, 4, 1);
-        lcd_line(x-4, 28, x-4, 36, 0);
+        if (time_ms() - last_update < 100) continue;
+        last_update = time_ms();
 
-        for (i=0; i<25000; ++i) asm volatile ("nop");
+        update_game();
     }
 
     return 0;

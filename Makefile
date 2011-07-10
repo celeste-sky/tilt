@@ -31,7 +31,8 @@ LDFLAGS:= $(CFLAGS)
 OBJCOPY:=avr-objcopy
 
 # List of sources to compile into hex
-SRCS:= lcd.c \
+SRCS:= gamestate.c \
+       lcd.c \
        main.c \
        timer.c \
 	   usart.c

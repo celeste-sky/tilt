@@ -54,6 +54,16 @@ void lcd_line(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t is_set) {
     usart0_tx(is_set);
 }
 
+void lcd_rect(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, uint8_t is_set) {
+    usart0_tx('|');
+    usart0_tx(0xf);
+    usart0_tx(x1);
+    usart0_tx(y1);
+    usart0_tx(x2);
+    usart0_tx(y2);
+    //usart0_tx(is_set);
+}
+
 void lcd_circ(uint8_t x, uint8_t y, uint8_t r, uint8_t is_set) {
     usart0_tx('|');
     usart0_tx(0x3);
